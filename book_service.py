@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from Dto import *
+from exceptions import *
 from typing import List
 
 class BookService(ABC):
@@ -25,15 +26,3 @@ class BookServiceV1(BookService):
         if book is None:
             raise BookNotFoundError()
         return book
-
-    def get_books_by_id(self, ids: List[int]) -> BookSearchResultDto:
-        books = []
-        for id in ids:
-            books.append(self.client.get_by_id(id))
-            if book is not None:
-                books.append(book)
-            raise BooksNotFoundError()
-        return BookSearchResultDto(count=len(books), next=None, prev=None, results=books)
-    
-    
-

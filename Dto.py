@@ -1,15 +1,22 @@
 from dataclasses import dataclass
-from typing import List, dict, Optional
+from enum import Enum
+from typing import List, Dict, Optional
 from datetime import date
+
+@dataclass
+class PersonDto:
+    birth_year: Optional[int]
+    death_year: Optional[int]
+    name : str
 
 @dataclass
 class BookDto:
     id: int
     title: str
     subjects : List[str]
-    authors: List[str]
+    authors: List[PersonDto]
     summaries: List[str]
-    translators: List[str]
+    translators: List[PersonDto]
     bookshelves: List[str]
     languages: List[str]
     copyright: Optional[bool]
@@ -23,12 +30,15 @@ class BookSearchResultDto:
     next: Optional[str]
     prev: Optional[str]
     results: List[BookDto]
-    
+
 @dataclass
-class PersonDto:
-    birth_year: Optional[int]
-    death_year: Optional[int]
-    name : str
+class BookItemResultDto:
+    id: int
+    status: int
+    book: Optional[BookDto] = None
+    error : Optional[str] = None
+    
+
 
 
 @dataclass
@@ -55,5 +65,17 @@ class ReviewDto:
 
 
 @dataclass
+class UpdateReviewDto:
+    comment: str
+    rating: int
+
+
+@dataclass
 class ReviewsSearchsDto:
     results: List[ReviewDto]
+
+class ReviewStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSED = "processed"
+
+    

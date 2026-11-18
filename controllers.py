@@ -2,18 +2,22 @@ from abc import ABC, abstractmethod
 from Dto import *
 from review_service import ReviewService
 from book_service import BookService
-from fastapi import APIRouter, Depends HTTPException
+from fastapi import APIRouter, HTTPException
 
 from exceptions import *
 
 #interfaces
 class BookController(ABC):
     @abstractmethod
-    def search_books_by_id(self, id: int) -> BookSearchResultDto:
+    def search_book_by_id(self, book_id: int) -> BookDto:
         pass
 
     @abstractmethod
-    def search_books_by_keyword(self, keywords: str):
+    def search_books_by_id(self, ids: List[int]) -> BookSearchResultDto:
+        pass
+
+    @abstractmethod
+    def search_books_by_keyword(self, keywords: str) -> BookSearchResultDto:
         pass
 
 class ReviewController(ABC):
@@ -22,29 +26,16 @@ class ReviewController(ABC):
         pass
 
     @abstractmethod
-    def get_review(self, id: int) -> ReviewDto:
+    def get_review(self, review_id: int) -> ReviewDto:
         pass
 
     @abstractmethod
-    def update_review(self, id: int, comment: str, rating: int ) -> ReviewDto:
+    def update_review(self, review_id: int, comment: str, rating: int, reviewer_id: int ) -> ReviewDto:
         pass
 
     @abstractmethod
-    def delete_review(self, id: int) -> None:
+    def delete_review(self, review_id: int, reviewer_id: int) -> None:
         pass
-
-
-
-class ReviewControllerV1(ReviewController):
-
-    router = APIRouter()
-    def __init__(self, service: ReviewService) -> None:
-        super().__init__()
-        self.service = service
-
-    def publish_review(self, dto: CreateReviewDto, reviewer_id: int) -> ReviewDto:
-
-
 
 class BookControllerV1(BookController):
     GENERAL_ERROR_MESSAGE = "Something went wrong"
@@ -53,12 +44,86 @@ class BookControllerV1(BookController):
         super().__init__()
         self.service = service
 
-    def fetch_books(self, skip= 0, limit: int = 10):
-        return self.service.get_books_by_id(skip, limit)
+    def search_book_by_id(self, book_id: int) -> BookDto:
+        try:
+            return self.service.get_book_by_id(book_id)
+        except BookNotFoundError:
+            raise HTTPException(status_code=404, detail= "book not found")
+        except ExternalApiError:
+            raise HTTPException(status_code=503, detail= "Books provider not found")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=self.GENERAL_ERROR_MESSAGE)
+
+    def search_books_by_id(self, books_ids: List[int]) -> List[BookItemResultDto]:
+        results = []
+        for id in books_ids:
+            try:
+                results.append(BookItemResultDto(id=id, status=200, book=self.search_book_by_id(id)))
+            except HTTPException as e:
+                results.append(BookItemResultDto(id=id, status=e.status_code, error=e.detail))
+        return results
+
+class ReviewControllerV1(ReviewController):
+    GENERAL_ERROR_MESSAGE = "something went wrong"
+
+    def __init__(self, service: ReviewService) -> None:
+        super().__init__()
+        self.service = service
+
+    def publish_review(self, dto: CreateReviewDto, reviewer_id: int)-> ReviewDto:
+        try:
+            return self.service.publish_review(dto, reviewer_id)
+        except BookNotFoundError:
+            raise HTTPException(status_code=404, detail="book not found")
+        except InvalidRatingError:
+            raise HTTPException(status_code = 422, detail="invalid rating error")
+        except InvalidCommentError:
+            raise HTTPException(status_code= 422, detail="Invalid comment")
+        except ExternalApiError:
+            raise HTTPException(status_code = 503, detail= "Books provider failed")
+        except Exception:
+            raise HTTPException(status_code = 500, detail=self.GENERAL_ERROR_MESSAGE)
+
+    def get_review(self, review_id: int) -> ReviewDto:
+        try:
+            return self.service.get_review(review_id)
+        except ReviewNotFoundError:
+            raise HTTPException(status_code=404, detail="Review id not found")
+        except Exception:
+            raise HTTPException(status_code=500, detail= self.GENERAL_ERROR_MESSAGE)
+
+    def update_review(self, review_id: int, comment: str, rating: int, reviewer_id: int ) -> ReviewDto:
+        try:
+            return self.service.update_review(review_id, comment, rating, reviewer_id)
+        except ReviewNotFoundError:
+            raise HTTPException(status_code=404, detail= "review id not found")
+        except ReviewerNotFoundError:
+            raise HTTPException(status_code=404, detail="Reviewer id not found")
+        except InvalidRatingError:
+            raise HTTPException(status_code = 422, detail="invalid rating error")
+        except InvalidCommentError:
+            raise HTTPException(status_code= 422, detail="Invalid comment")
+        except ExternalApiError:
+            raise HTTPException(status_code = 503, detail= "Books provider failed")
+        except Exception:
+            raise HTTPException(status_code=500, detail= self.GENERAL_ERROR_MESSAGE)
+
+
+    def delete_review(self, review_id: int, reviewer_id: int) -> None:
+        try:
+            return self.service.delete_review(review_id, reviewer_id)
+        except ReviewNotFoundError:
+            raise HTTPException(status_code=404, detail = "review id not found")
+        except ReviewerNotFoundError:
+            raise HTTPException(status_code=404, detail = "reviewer id not found")
+        except Exception:
+            raise HTTPException(status_code=500, detail=self.GENERAL_ERROR_MESSAGE)
+
+
+    
+            
 
     
 
 
 
-
-class ReviewControllerV1()
