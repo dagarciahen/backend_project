@@ -1,6 +1,6 @@
-from exceptions import InvalidRatingError, BookNotFoundError, InvalidCommentError
-from Dto import CreateReviewDto
-from book_client import BookClient
+from app.exceptions import InvalidRatingError, BookNotFoundError, InvalidCommentError
+from app.models.dto import CreateReviewDto
+from app.client.book_client import BookClient
 
 class ReviewValidator:
     def __init__(self, client: BookClient) -> None:

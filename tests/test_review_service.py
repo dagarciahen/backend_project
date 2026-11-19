@@ -1,11 +1,11 @@
 from unittest.mock import Mock 
-from models import Review
+from app.models.models import Review, ReviewCreated
 from datetime import date 
-from review_queue import ReviewQueue
-from Dto import CreateReviewDto, ReviewDto, ReviewStatus, BookDto
-from book_client import BookClient
-from review_service import ReviewServiceV1
-from repository import ReviewRepository
+from app.messaging.review_queue import ReviewQueue
+from app.models.dto import CreateReviewDto, ReviewDto, ReviewStatus, BookDto
+from app.client.book_client import BookClient
+from app.services.review_service import ReviewServiceV1
+from app.repository.repository import ReviewRepository
 
 def test_publish_review_ok():
     client= Mock(spec=BookClient)
@@ -29,7 +29,7 @@ def test_publish_review_ok():
 
     repository.save.assert_called_once_with(review, status=ReviewStatus.PENDING)
     service.mapper.to_dto.assert_called_once_with(saved)
-    queue.publish_review_created.assert_called_once_with(2)
+    queue.publish_review_created.assert_called_once_with(ReviewCreated(review_id=2))
     
     
     
@@ -60,7 +60,7 @@ def test_update_review_ok():
     assert result is expected_dto
     service.validator.validate_update.assert_called_once_with(4, "Excellent")
     repository.update.assert_called_once_with(5, "Excellent", 4, status=ReviewStatus.PENDING)
-    queue.publish_review_created.assert_called_once_with(5)
+    queue.publish_review_created.assert_called_once_with(ReviewCreated(review_id=5))
     service.mapper.to_dto.assert_called_once_with(updated)
     
     

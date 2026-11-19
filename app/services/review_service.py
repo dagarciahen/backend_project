@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from book_client import *
-from exceptions import *
-from repository import ReviewRepository
-from review_queue import ReviewQueue
-from Dto import *
+from app.client.book_client import *
+from app.exceptions import *
+from app.repository.repository import ReviewRepository
+from app.messaging.review_queue import RabbitMQReviewQueue
+from app.models.models import ReviewCreated
+from app.models.dto import *
 from typing import List
-from review_validator import ReviewValidator
-from review_mapper import ReviewMapper
+from app.services.review_validator import ReviewValidator
+from app.services.review_mapper import ReviewMapper
 
 #interface
 
@@ -29,7 +30,7 @@ class ReviewService(ABC):
 
 
 class ReviewServiceV1(ReviewService):
-    def __init__(self, client: BookClient, repository: ReviewRepository, queue: ReviewQueue) -> None:
+    def __init__(self, client: BookClient, repository: ReviewRepository, queue: RabbitMQReviewQueue) -> None:
         self.client = client
         self.repository = repository
         self.queue = queue 
@@ -45,25 +46,25 @@ class ReviewServiceV1(ReviewService):
         self.validator.validate_create(dto)
         review = self.mapper.to_entity(dto, reviewer_id)
         saved = self.repository.save(review, status=ReviewStatus.PENDING)
-        self.queue.publish_review_created(saved.review_id)
+        self.queue.publish_review_created(ReviewCreated(saved.review_id))
         return self.mapper.to_dto(saved)
 
     def get_review(self, review_id: int) -> ReviewDto:
         review = self.repository.get_by_id(review_id)
         if review is None:
             raise ReviewNotFoundError
-        return review
+        return self.mapper.to_dto(review)
     
     def update_review(self, review_id: int, comment: str, rating: int, reviewer_id: int) -> ReviewDto:
         self.validator.validate_update(rating, comment)
         review = self.repository.get_by_id(review_id)
         if review is None:
-            raise ReviewerNotFoundError
+            raise ReviewNotFoundError
         if review.reviewer_id != reviewer_id:
             raise ReviewerNotFoundError()
         
         updated = self.repository.update(review_id, comment, rating, status=ReviewStatus.PENDING)
-        self.queue.publish_review_created(updated.review_id)
+        self.queue.publish_review_created(ReviewCreated(updated.review_id))
         return self.mapper.to_dto(updated)
 
 

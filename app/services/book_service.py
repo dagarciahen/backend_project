@@ -1,16 +1,12 @@
 from abc import ABC, abstractmethod
-from Dto import *
-from exceptions import *
+from app.models.dto import *
+from app.exceptions import *
 from typing import List
-from book_client import BookClient
+from app.client.book_client import BookClient
 
 class BookService(ABC):
     @abstractmethod
     def get_book_by_id(self, id: int) -> BookSearchResultDto:
-        pass
-
-    @abstractmethod
-    def get_books_by_id(self, ids: List[int]) -> BookSearchResultDto:
         pass
 
     @abstractmethod
@@ -27,3 +23,12 @@ class BookServiceV1(BookService):
         if book is None:
             raise BookNotFoundError()
         return book
+
+    def get_books_by_keywords(self, query) -> BookSearchResultDto:
+        return self.client.search(query)
+
+
+
+
+    
+    

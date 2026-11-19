@@ -9,3 +9,5 @@ in this way the answer to the post request is fast and the user dont wait to bei
 separation of responsabilites between api and worker, if worker is slow the api can continue to accept reviews
 durability -> with the queue the messages persits over time and the work is not loss
 rtries -> if workers fails the message can be retried
+
+-- handle duplicate reviewq if post fail 

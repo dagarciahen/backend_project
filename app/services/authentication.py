@@ -1,6 +1,8 @@
-from fastapi import Depends, HTTPException, stauts
+from fastapi import Depends, HTTPException, status
+from app.repository.reviewer_repository import MariaDBReviewerRepository
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from auth_service import AuthService, AuthServiceV1
+from typing import Annotated
+from app.services.auth_service import AuthService, AuthServiceV1
 
 ## for simplicity will implement simple authentication with user and password to send in the header of the request
 ##to avoid a reviewer impersonate another reviewer and send userid on the post.review request
@@ -10,7 +12,7 @@ from auth_service import AuthService, AuthServiceV1
 security = HTTPBasic()
 
 def get_auth_service() -> AuthService:
-    return AuthServiceV1(MariaDbReviewerRepository())
+    return AuthServiceV1(MariaDBReviewerRepository())
 
 def get_current_reviewer_id(credentials: Annotated[HTTPBasicCredentials, Depends(security)], auth: AuthService = Depends(get_auth_service)) -> int:
     reviewer_id = auth.authenticate(credentials.username, credentials.password)

@@ -1,62 +1,100 @@
 import pytest
 from unittest.mock import Mock
 from fastapi import HTTPException
-from book_client import BookClient
-from Dto import *
-from exceptions import *
-from review_service import ReviewService
-from controllers import ReviewControllerV1
+from app.models.dto import *
+from app.exceptions import *
+from app.services.review_service import ReviewService
+from app.controllers.controllers import ReviewControllerV1
 
 
 
-#for tda
-@pytest.fixture
-def service():
-    return Mock(spec=ReviewService)
+def test_publish_review_ok():
+    service = Mock(spec=ReviewService)
+    review_dto = Mock(spec=ReviewDto)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.return_value = review_dto
+    controller = ReviewControllerV1(service)
+
+    result = controller.publish_review(create_review_dto, 1)
+    assert result is review_dto
+    service.publish_review.assert_called_once_with(create_review_dto, 1)
 
 
-@pytest.fixture
-def controller(service):
-    return ReviewControllerV1(service)
 
 
-def test_publish_review_ok(service, controller):
-    expected = Mock(spec=ReviewDto)
-    service.publish_review.return_value = expected
-    
-    service.publish_review.return_value = expected
+def test_update_review_ok():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    review_dto = Mock(spec=ReviewDto)
+    service.update_review.return_value = review_dto
 
-    result = controller.publish_review(DTO, reviewer_id=7)
+    result = controller.update_review(5, "new", 4, 7)
 
-    assert result is expected
-    service.publish_review.assert_called_once_with(DTO, 7)
+    assert result is review_dto 
+    service.update_review.assert_called_once_with(5, "new", 4, 7)
 
-def test_update_review_ok(service, controller):
-    expected = Mock(spec=ReviewDto)
-    service.publish_review.return_value =expected
-    result = controller.update_review(5, "not so great", 4, reviewer_id=7)
-    assert result is expected
-    service.update_review.assert_called_once_with(5, "not so great", 4, 7)
-    
-
-@pytest.mark.parametrize("error, status", [
-    (InvalidRatingError(), 400),
-    (InvalidCommentError(), 400),
-    (BookNotFoundError(), 404),
-    (ExternalApiError(), 503),
-    (RuntimeError("boom"), 500),
-])
-def test_publish_review_errors(controller, service, error, status):
-    service.publish_review.side_effect = error
+def test_publish_review_invalid_rating():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.side_effect = InvalidRatingError()
 
     with pytest.raises(HTTPException) as exc:
-        controller.publish_review(DTO, reviewer_id=7)
+        controller.publish_review(create_review_dto, reviewer_id=7)
+    assert exc.value.status_code == 422
 
-    assert exc.value.status_code == status
+def test_publish_review_invalid_comment():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.side_effect = InvalidCommentError()
+
+    with pytest.raises(HTTPException) as exc:
+        controller.publish_review(create_review_dto, reviewer_id=7)
+
+    assert exc.value.status_code == 422
 
 
-def test_get_review_not_found(controller, service):
-    service.get_review_by_id.side_effect = ReviewNotFoundError()
+def test_publish_review_book_not_found():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.side_effect = BookNotFoundError()
+
+    with pytest.raises(HTTPException) as exc:
+        controller.publish_review(create_review_dto, reviewer_id=7)
+
+    assert exc.value.status_code == 404
+
+
+def test_publish_review_external_api_error():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.side_effect = ExternalApiError()
+
+    with pytest.raises(HTTPException) as exc:
+        controller.publish_review(create_review_dto, reviewer_id=7)
+
+    assert exc.value.status_code == 503
+
+
+def test_publish_review_unexpected_error():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    create_review_dto = Mock(spec=CreateReviewDto)
+    service.publish_review.side_effect = RuntimeError("boom")
+
+    with pytest.raises(HTTPException) as exc:
+        controller.publish_review(create_review_dto, reviewer_id=7)
+
+    assert exc.value.status_code == 500
+
+
+def test_get_review_not_found():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    service.get_review.side_effect = ReviewNotFoundError()
 
     with pytest.raises(HTTPException) as exc:
         controller.get_review(5)
@@ -64,24 +102,57 @@ def test_get_review_not_found(controller, service):
     assert exc.value.status_code == 404
 
 
-@pytest.mark.parametrize("error, status", [
-    (ReviewNotFoundError(), 404),
-    (ReviewerNotFoundError(), 403),
-    (InvalidRatingError(), 400),
-])
-def test_update_review_maps_errors(controller, service, error, status):
-    service.update_review.side_effect = error
+def test_update_review_ok():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    review_dto = Mock(spec=ReviewDto)
+    service.update_review.return_value = review_dto
+
+    result = controller.update_review(5, "new", 4, 7)
+
+    assert result is review_dto
+    service.update_review.assert_called_once_with(5, "new", 4, 7)
+
+
+def test_update_review_not_found():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    service.update_review.side_effect = ReviewNotFoundError()
 
     with pytest.raises(HTTPException) as exc:
         controller.update_review(5, "new", 4, reviewer_id=7)
 
-    assert exc.value.status_code == status
+    assert exc.value.status_code == 404
 
 
-def test_delete_review_not_owner(controller, service):
+def test_update_review_reviewer_not_found():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    service.update_review.side_effect = ReviewerNotFoundError()
+
+    with pytest.raises(HTTPException) as exc:
+        controller.update_review(5, "new", 4, reviewer_id=7)
+
+    assert exc.value.status_code == 404
+
+
+def test_update_review_invalid_rating():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
+    service.update_review.side_effect = InvalidRatingError()
+
+    with pytest.raises(HTTPException) as exc:
+        controller.update_review(5, "new", 4, reviewer_id=7)
+
+    assert exc.value.status_code == 422
+
+
+def test_delete_review_reviewer_not_found():
+    service = Mock(spec=ReviewService)
+    controller = ReviewControllerV1(service)
     service.delete_review.side_effect = ReviewerNotFoundError()
 
     with pytest.raises(HTTPException) as exc:
         controller.delete_review(5, reviewer_id=7)
 
-    assert exc.value.status_code == 403
+    assert exc.value.status_code == 404

@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from Dto import *
-from review_service import ReviewService
-from book_service import BookService
+from app.models.dto import *
+from typing import List
+from app.services.review_service import ReviewService
+from app.services.book_service import BookService
 from fastapi import APIRouter, HTTPException
 
-from exceptions import *
+from app.exceptions import *
 
 #interfaces
 class BookController(ABC):
@@ -54,14 +55,15 @@ class BookControllerV1(BookController):
         except Exception as e:
             raise HTTPException(status_code=500, detail=self.GENERAL_ERROR_MESSAGE)
 
-    def search_books_by_id(self, books_ids: List[int]) -> List[BookItemResultDto]:
-        results = []
-        for id in books_ids:
-            try:
-                results.append(BookItemResultDto(id=id, status=200, book=self.search_book_by_id(id)))
-            except HTTPException as e:
-                results.append(BookItemResultDto(id=id, status=e.status_code, error=e.detail))
-        return results
+    def search_books_by_keyword(self, keywords) -> Optional[BookSearchResultDto]:
+        try:
+            return self.service.get_books_by_keywords(keywords)
+        except BookNotFoundError:
+            raise HTTPException(status_code = 503, detail = "Book not found")
+        except ExternalApiError:
+            raise HTTPException(status_code = 503, detail = "Books provider not found")
+        except Exception:
+            raise HTTPException(status_code =500, detail = self.GENERAL_ERROR_MESSAGE)
 
 class ReviewControllerV1(ReviewController):
     GENERAL_ERROR_MESSAGE = "something went wrong"
@@ -118,12 +120,4 @@ class ReviewControllerV1(ReviewController):
             raise HTTPException(status_code=404, detail = "reviewer id not found")
         except Exception:
             raise HTTPException(status_code=500, detail=self.GENERAL_ERROR_MESSAGE)
-
-
-    
-            
-
-    
-
-
 

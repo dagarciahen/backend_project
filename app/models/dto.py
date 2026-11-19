@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Dict, Optional
-from datetime import date
+from datetime import datetime
 
 @dataclass
 class PersonDto:
@@ -28,7 +28,7 @@ class BookDto:
 class BookSearchResultDto:
     count: Optional[int]
     next: Optional[str]
-    prev: Optional[str]
+    previous: Optional[str]
     results: List[BookDto]
 
 @dataclass
@@ -37,7 +37,22 @@ class BookItemResultDto:
     status: int
     book: Optional[BookDto] = None
     error : Optional[str] = None
-    
+
+
+@dataclass
+class ReviewerDto:
+    reviewer_id: int
+    username: str
+    joined_at: datetime
+    review_count: int
+@dataclass
+class ReviewsSearchsDto:
+    results: List[ReviewDto]
+
+class ReviewStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSED = "processed"
+    PROCESSING = "processing"
 
 
 
@@ -47,12 +62,7 @@ class CreateReviewDto:
     rating: int
     comment: str
 
-@dataclass
-class ReviewerDto:
-    reviewer_id: str
-    username: str
-    joined_at: date 
-    review_count: int
+
 
 @dataclass
 class ReviewDto:
@@ -61,7 +71,8 @@ class ReviewDto:
     reviewer_id: int
     rating: int
     comment: str
-    review_date: date
+    review_date: datetime
+    status : ReviewStatus
 
 
 @dataclass
@@ -70,12 +81,5 @@ class UpdateReviewDto:
     rating: int
 
 
-@dataclass
-class ReviewsSearchsDto:
-    results: List[ReviewDto]
-
-class ReviewStatus(str, Enum):
-    PENDING = "pending"
-    PROCESSED = "processed"
 
     

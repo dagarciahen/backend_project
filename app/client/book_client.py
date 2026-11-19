@@ -2,8 +2,8 @@ import requests
 from typing import List, Optional
 from pydantic import TypeAdapter, ValidationError
 from abc import ABC, abstractmethod
-from exceptions import *
-from Dto import *
+from app.exceptions import *
+from app.models.dto import *
 from dotenv import load_dotenv
 import os
 
@@ -19,10 +19,6 @@ class BookClient(ABC):
         pass
 
     @abstractmethod
-    def get_by_ids(self, ids: List[int]) -> BookSearchResultDto:
-        pass
-
-    @abstractmethod
     def search(self, query: str) -> BookSearchResultDto:
         pass
 
@@ -34,10 +30,6 @@ class GutendexClient(BookClient):
         if resp.status_code == 404:
             return None
         return self._parse(_book, resp)
-    
-    def get_by_ids(self, ids: List[int]) -> BookSearchResultDto:
-        resp = self._get(self.API_URL, params ={"ids": ",".join(map(str, ids))})
-        return self._parse(_result, resp)
 
     def search(self, query: str) -> BookSearchResultDto:
         resp = self._get(self.API_URL, params ={"search": query})
@@ -60,11 +52,7 @@ class GutendexClient(BookClient):
             raise ExternalApiError()
 
 """
-    def _to_result_dto(self, data: dict) -> BookSearchResultDto:
-        return BookSearchResultDto(
-            count=data["count"],
-            next=data["next"],
-            prev=data["previous"],
-            results=[self._to_book_dto(b) for b in data["results"]],
-        )
+    def get_by_ids(self, ids: List[int]) -> BookSearchResultDto:
+        resp = self._get(self.API_URL, params ={"ids": ",".join(map(str, ids))})
+        return self._parse(_result, resp)
 """

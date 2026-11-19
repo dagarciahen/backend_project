@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Dict, Optional
-from Dto import ReviewStatus
+from app.models.dto import ReviewStatus
 from datetime import date
 
 @dataclass
