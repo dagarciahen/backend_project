@@ -1,39 +1,15 @@
 import pytest
 from unittest.mock import Mock
 from fastapi import HTTPException
-
+from book_client import BookClient
 from Dto import *
 from exceptions import *
 from review_service import ReviewService
 from controllers import ReviewControllerV1
 
-class FakeReviewRepository(ReviewRepository):
-    def __init__(self):
-        self.reviews = {}
-        self.next_id = 1
-
-    def save(self, dto, reviewer_
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #for tda
-
-
-
 @pytest.fixture
 def service():
     return Mock(spec=ReviewService)
@@ -90,7 +66,7 @@ def test_get_review_not_found(controller, service):
 
 @pytest.mark.parametrize("error, status", [
     (ReviewNotFoundError(), 404),
-    (NotReviewOwnerError(), 403),
+    (ReviewerNotFoundError(), 403),
     (InvalidRatingError(), 400),
 ])
 def test_update_review_maps_errors(controller, service, error, status):
@@ -103,7 +79,7 @@ def test_update_review_maps_errors(controller, service, error, status):
 
 
 def test_delete_review_not_owner(controller, service):
-    service.delete_review.side_effect = NotReviewOwnerError()
+    service.delete_review.side_effect = ReviewerNotFoundError()
 
     with pytest.raises(HTTPException) as exc:
         controller.delete_review(5, reviewer_id=7)

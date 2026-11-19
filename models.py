@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import List, dict, Optional
+from typing import List, Dict, Optional
+from Dto import ReviewStatus
 from datetime import date
 
 @dataclass
@@ -28,10 +29,14 @@ class Reviewer:
     
 @dataclass
 class Review:
-    review_id: int
-    joined_at: date   
     reviewer_id: int
     book_id: int
     comment: str
     rating: int
-    review_date: date
+    status: ReviewStatus = ReviewStatus.PENDING
+    review_id : Optional[int] = None 
+    review_date : Optional[date] = None
+
+@dataclass
+class ReviewCreated:
+    review_id : int 

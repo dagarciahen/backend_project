@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from Dto import *
 from exceptions import *
 from typing import List
+from book_client import BookClient
 
 class BookService(ABC):
     @abstractmethod
