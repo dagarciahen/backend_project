@@ -63,21 +63,19 @@ def test_update_review_ok():
     queue.publish_review_created.assert_called_once_with(ReviewCreated(review_id=5))
     service.mapper.to_dto.assert_called_once_with(updated)
     
-    
-    
 
 def test_get_review_ok():
     client= Mock(spec=BookClient)
     repository = Mock(spec=ReviewRepository)
-    review = Mock(spec=ReviewDto)
-    review.review_id = 1
-    review.reviewer_id = 2
-
     queue = Mock(spec=ReviewQueue)
     service = ReviewServiceV1(client, repository, queue)
-    repository.get_by_id.return_value = review
+    service.mapper = Mock()
+    expected_dto = Mock(spec=ReviewDto)
+    service.mapper.to_dto.return_value = expected_dto
+
+    repository.get_by_id.return_value = expected_dto
     result = service.get_review(1)
-    assert result is review
+    assert result is expected_dto
     repository.get_by_id.assert_called_once_with(1)
 
 def test_delete_review_ok():
@@ -93,7 +91,7 @@ def test_delete_review_ok():
 
     repository.delete.return_value = review
     service.delete_review(1,2)
-    repository.delete.assert_called_once_with(1)
+    repository.delete.assert_called_once_with(1,2)
     
 
 

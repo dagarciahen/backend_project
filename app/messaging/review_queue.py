@@ -29,7 +29,7 @@ class RabbitMQReviewQueue(ReviewQueue):
             channel = connection.channel()
             channel.exchange_declare(exchange= self.EXCHANGE, exchange_type="direct", durable=True)
             channel.queue_declare(queue=self.QUEUE, durable = True)
-            channel.queue.bind(queue=self.QUEUE, exchange=self.EXCHANGE, routing_key=self.ROUTING_KEY)
+            channel.queue_bind(queue=self.QUEUE, exchange=self.EXCHANGE, routing_key=self.ROUTING_KEY)
             channel.basic_publish(exchange=self.EXCHANGE, routing_key=self.ROUTING_KEY, body=json.dumps({"review_id": event.review_id}), properties=pika.BasicProperties(delivery_mode=2))
         finally:
             connection.close()

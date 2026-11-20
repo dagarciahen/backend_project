@@ -21,6 +21,9 @@ class ReviewRepository(ABC):
     @abstractmethod
     def get_by_id(self, review_id: int, reviewer_id : int) -> Optional[Review]:
         pass
+    @abstractmethod
+    def update_status(self, review_id: int, status: ReviewStatus) -> None:
+        pass 
 
 class MariaDbReviewRepository(ReviewRepository):
     def __init__(self, database: Database) -> None:
@@ -94,6 +97,19 @@ class MariaDbReviewRepository(ReviewRepository):
         finally:
             conn.close()
         
+
+    def update_status(self, review_id: int, status: ReviewStatus) -> None:
+        conn = self.database.get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE reviews SET status = ? WHERE review_id = ?",
+                (status.value, review_id)
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
 
 
 

@@ -9,9 +9,11 @@ from typing import List, Annotated
 from app.services.authentication import get_current_reviewer_id
 from app.repository.repository import ReviewRepository, MariaDbReviewRepository
 from app.config.database_settings import Database
+from app.config.rabbitmq import RabbitMQ
 from app.messaging.review_queue import RabbitMQReviewQueue
 from app.services.book_service import BookServiceV1 
 from app.services.review_service import ReviewServiceV1
+
 
 router = APIRouter()
 MAX_BOOK_ID = MAX_ID = 2_147_483_647
@@ -23,7 +25,7 @@ def get_book_controller() -> BookController:
     return BookControllerV1(BookServiceV1(GutendexClient()))
 
 def get_review_controller() -> ReviewController:
-    service = ReviewServiceV1(GutendexClient(), MariaDbReviewRepository(database), RabbitMQReviewQueue())
+    service = ReviewServiceV1(GutendexClient(), MariaDbReviewRepository(database), RabbitMQReviewQueue(RabbitMQ()))
     return ReviewControllerV1(service)
 
 ##books

@@ -15,7 +15,7 @@ class ReviewWorker(ABC):
     def process(self, event: ReviewCreated) -> None:
         pass
     @abstractmethod
-    def on_message():
+    def parser(self, channel, method, properties, body):
         pass
 
     @abstractmethod 
@@ -30,7 +30,7 @@ class RabbitMQWorker(ReviewWorker):
 
     def __init__(self, rabbitmq: RabbitMQ, repository: MariaDbReviewRepository):
         self.rabbitmq = rabbitmq
-        self.repository = self.repository
+        self.repository = repository
 
     def process(self, event: ReviewCreated) -> None:
         self.repository.update_status(event.review_id, ReviewStatus.PROCESSED)
@@ -41,7 +41,7 @@ class RabbitMQWorker(ReviewWorker):
             event = ReviewCreated(**json.loads(body))
             self.process(event)
         except Exception:
-            channel.basic_nack(delivery_tag=method.delivery_tag, requeu=True)
+            channel.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
             return 
         channel.basic_ack(delivery_tag=method.delivery_tag)
         

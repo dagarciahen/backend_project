@@ -74,7 +74,7 @@ class ReviewServiceV1(ReviewService):
             raise ReviewNotFoundError
         if review.reviewer_id != reviewer_id:
             raise ReviewerNotFoundError()
-        self.repository.delete(review_id)
+        self.repository.delete(review_id, reviewer_id)
 
 
 
