@@ -1,9 +1,11 @@
 import json
 from unittest.mock import Mock
+
 import pytest
 
-from app.models.models import ReviewCreated
+from app.exceptions import PublishError
 from app.messaging.review_queue import RabbitMQReviewQueue
+from app.models.models import ReviewCreated
 
 
 def test_publish_uses_exchange_and_routing_key():
@@ -47,6 +49,6 @@ def test_connection_closes_after_error():
     channel = connection.channel.return_value
     queue = RabbitMQReviewQueue(rabbitmq)
     channel.basic_publish.side_effect = Exception("rabbit down")
-    with pytest.raises(Exception):
+    with pytest.raises(PublishError):
         queue.publish_review_created(ReviewCreated(review_id=5))
-    connection.close_assert_called_once()
+    connection.close.assert_called_once()

@@ -1,17 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+
+from app.config.database_settings import Database
 from app.models.models import Reviewer
+
+database = Database()
 
 class ReviewerRepository(ABC):
     @abstractmethod
-    def get_by_username(self, username: str) -> Optional[Reviewer]:
+    def get_by_username(self, username: str) -> Reviewer | None:
         pass
 
 class MariaDBReviewerRepository(ReviewerRepository):
     def __init__(self):
         self.database = database 
 
-    def get_by_username(self, username: str) -> Optional[Reviewer]:
+    def get_by_username(self, username: str) -> Reviewer | None:
         conn = self.database.get_connection()
         try:
             cursor = conn.cursor()

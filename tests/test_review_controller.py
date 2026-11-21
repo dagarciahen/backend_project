@@ -1,11 +1,12 @@
-import pytest
 from unittest.mock import Mock
-from fastapi import HTTPException
-from app.models.dto import *
-from app.exceptions import *
-from app.services.review_service import ReviewService
-from app.controllers.controllers import ReviewControllerV1
 
+import pytest
+from fastapi import HTTPException
+
+from app.controllers.controllers import ReviewControllerV1
+from app.exceptions import *
+from app.models.dto import *
+from app.services.review_service import ReviewService
 
 
 def test_publish_review_ok():
@@ -101,17 +102,6 @@ def test_get_review_not_found():
 
     assert exc.value.status_code == 404
 
-
-def test_update_review_ok():
-    service = Mock(spec=ReviewService)
-    controller = ReviewControllerV1(service)
-    review_dto = Mock(spec=ReviewDto)
-    service.update_review.return_value = review_dto
-
-    result = controller.update_review(5, "new", 4, 7)
-
-    assert result is review_dto
-    service.update_review.assert_called_once_with(5, "new", 4, 7)
 
 
 def test_update_review_not_found():

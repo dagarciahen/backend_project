@@ -1,67 +1,18 @@
 from dataclasses import dataclass
-from enum import Enum
-from typing import List, Dict, Optional
 from datetime import datetime
+from enum import Enum
+
 
 @dataclass
 class PersonDto:
-    birth_year: Optional[int]
-    death_year: Optional[int]
+    birth_year: int | None
+    death_year: int | None
     name : str
-
-@dataclass
-class BookDto:
-    id: int
-    title: str
-    subjects : List[str]
-    authors: List[PersonDto]
-    summaries: List[str]
-    translators: List[PersonDto]
-    bookshelves: List[str]
-    languages: List[str]
-    copyright: Optional[bool]
-    media_type: str
-    formats: dict[str, str]
-    download_count: int
-
-@dataclass
-class BookSearchResultDto:
-    count: Optional[int]
-    next: Optional[str]
-    previous: Optional[str]
-    results: List[BookDto]
-
-@dataclass
-class BookItemResultDto:
-    id: int
-    status: int
-    book: Optional[BookDto] = None
-    error : Optional[str] = None
-
-
-@dataclass
-class ReviewerDto:
-    reviewer_id: int
-    username: str
-    joined_at: datetime
-    review_count: int
-@dataclass
-class ReviewsSearchsDto:
-    results: List[ReviewDto]
 
 class ReviewStatus(str, Enum):
     PENDING = "pending"
     PROCESSED = "processed"
     PROCESSING = "processing"
-
-
-
-@dataclass
-class CreateReviewDto:
-    book_id: int
-    rating: int
-    comment: str
-
 
 
 @dataclass
@@ -73,6 +24,55 @@ class ReviewDto:
     comment: str
     review_date: datetime
     status : ReviewStatus
+
+@dataclass
+class BookDto:
+    id: int
+    title: str
+    subjects : list[str]
+    authors: list[PersonDto]
+    summaries: list[str]
+    translators: list[PersonDto]
+    bookshelves: list[str]
+    languages: list[str]
+    copyright: bool | None
+    media_type: str
+    formats: dict[str, str]
+    download_count: int
+
+@dataclass
+class BookSearchResultDto:
+    count: int | None
+    next: str | None
+    previous: str | None
+    results: list[BookDto]
+
+@dataclass
+class BookItemResultDto:
+    id: int
+    status: int
+    book: BookDto | None = None
+    error : str | None = None
+
+
+@dataclass
+class ReviewerDto:
+    reviewer_id: int
+    username: str
+    joined_at: datetime
+    review_count: int
+@dataclass
+class ReviewsSearchsDto:
+    results: list[ReviewDto]
+
+
+
+@dataclass
+class CreateReviewDto:
+    book_id: int
+    rating: int
+    comment: str
+
 
 
 @dataclass

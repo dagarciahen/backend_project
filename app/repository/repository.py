@@ -1,8 +1,8 @@
+from abc import ABC, abstractmethod
+
+from app.config.database_settings import Database
 from app.models.dto import *
 from app.models.models import *
-from abc import ABC, abstractmethod
-from app.config.database_settings import Database
-
 
 
 class ReviewRepository(ABC):

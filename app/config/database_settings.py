@@ -1,4 +1,5 @@
 import os
+
 import mariadb
 from dotenv import load_dotenv
 

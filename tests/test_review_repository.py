@@ -1,10 +1,8 @@
-from unittest.mock import Mock 
+from datetime import date
+from unittest.mock import Mock
+
+from app.models.dto import ReviewStatus
 from app.models.models import Review
-from datetime import date 
-from app.messaging.review_queue import ReviewQueue
-from app.models.dto import CreateReviewDto, ReviewDto, ReviewStatus, BookDto
-from app.client.book_client import BookClient
-from app.services.review_service import ReviewServiceV1
 from app.repository.repository import MariaDbReviewRepository
 
 

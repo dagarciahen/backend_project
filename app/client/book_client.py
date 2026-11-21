@@ -1,11 +1,12 @@
-import requests
-from typing import List, Optional
-from pydantic import TypeAdapter, ValidationError
+import os
 from abc import ABC, abstractmethod
+
+import requests
+from dotenv import load_dotenv
+from pydantic import TypeAdapter, ValidationError
+
 from app.exceptions import *
 from app.models.dto import *
-from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -15,7 +16,7 @@ _result = TypeAdapter(BookSearchResultDto)
 
 class BookClient(ABC):
     @abstractmethod
-    def get_by_id(self, id: int) -> Optional[BookDto]:
+    def get_by_id(self, id: int) -> BookDto | None:
         pass
 
     @abstractmethod
@@ -25,7 +26,7 @@ class BookClient(ABC):
 class GutendexClient(BookClient):
     API_URL = os.getenv("URL")
 
-    def get_by_id(self, id: int) -> Optional[BookDto]:
+    def get_by_id(self, id: int) -> BookDto | None:
         resp = self._get(f"{self.API_URL}/{id}")
         if resp.status_code == 404:
             return None
@@ -36,7 +37,7 @@ class GutendexClient(BookClient):
         return self._parse(_result, resp)
 
 
-    def _get(self, url: str, params: dict = None) -> requests.Response:
+    def _get(self, url: str, params: dict | None = None) -> requests.Response:
         try:
             resp = requests.get(url, params=params, timeout=5)
             if resp.status_code != 404:

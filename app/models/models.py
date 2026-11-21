@@ -1,21 +1,22 @@
 from dataclasses import dataclass
-from typing import List, Dict, Optional
-from app.models.dto import ReviewStatus
 from datetime import date
+
+from app.models.dto import ReviewStatus
+
 
 @dataclass
 class Book:
     id: int
     title: str
-    subjects: List[str]
-    authors: List[str]
-    summaries: List[str]
-    languages: List[str]
+    subjects: list[str]
+    authors: list[str]
+    summaries: list[str]
+    languages: list[str]
 
 @dataclass
 class Person:
-    birth_year : Optional[int]
-    death_year : Optional[int]
+    birth_year : int | None
+    death_year : int | None
     name : str
 
 
@@ -34,8 +35,8 @@ class Review:
     comment: str
     rating: int
     status: ReviewStatus = ReviewStatus.PENDING
-    review_id : Optional[int] = None 
-    review_date : Optional[date] = None
+    review_id : int | None = None 
+    review_date : date | None = None
 
 @dataclass
 class ReviewCreated:

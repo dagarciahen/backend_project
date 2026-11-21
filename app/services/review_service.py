@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
+
 from app.client.book_client import *
 from app.exceptions import *
-from app.repository.repository import ReviewRepository
 from app.messaging.review_queue import RabbitMQReviewQueue
-from app.models.models import ReviewCreated
 from app.models.dto import *
-from typing import List
-from app.services.review_validator import ReviewValidator
+from app.models.models import ReviewCreated
+from app.repository.repository import ReviewRepository
 from app.services.review_mapper import ReviewMapper
+from app.services.review_validator import ReviewValidator
 
 #interface
 

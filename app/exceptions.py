@@ -19,3 +19,6 @@ class ReviewNotFoundError(Exception):
 
 class ReviewerNotFoundError(Exception):
     pass
+
+class PublishError(Exception):
+    pass

@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from app.models.dto import *
-from app.exceptions import *
-from typing import List
+
 from app.client.book_client import BookClient
+from app.exceptions import *
+from app.models.dto import *
+
 
 class BookService(ABC):
     @abstractmethod

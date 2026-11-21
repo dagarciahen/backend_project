@@ -1,10 +1,10 @@
 from unittest.mock import Mock
-import pytest
-from app.repository.repository import ReviewRepository 
-from app.models.dto import ReviewStatus
-from app.messaging.review_worker import RabbitMQWorker
+
 from app.config.rabbitmq import RabbitMQ
+from app.messaging.review_worker import RabbitMQWorker
+from app.models.dto import ReviewStatus
 from app.models.models import ReviewCreated
+from app.repository.repository import ReviewRepository
 
 
 def test_consumes_from_exchanges():

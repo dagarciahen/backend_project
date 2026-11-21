@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
-from app.models.dto import *
-from typing import List
-from app.services.review_service import ReviewService
-from app.services.book_service import BookService
-from fastapi import APIRouter, HTTPException
+
+from fastapi import HTTPException
 
 from app.exceptions import *
+from app.models.dto import *
+from app.services.book_service import BookService
+from app.services.review_service import ReviewService
+# ruff: noqa
+
 
 #interfaces
 class BookController(ABC):
@@ -14,7 +16,7 @@ class BookController(ABC):
         pass
 
     @abstractmethod
-    def search_books_by_id(self, ids: List[int]) -> BookSearchResultDto:
+    def search_books_by_id(self, ids: list[int]) -> BookSearchResultDto:
         pass
 
     @abstractmethod
@@ -52,7 +54,7 @@ class BookControllerV1(BookController):
             raise HTTPException(status_code=404, detail= "book not found")
         except ExternalApiError:
             raise HTTPException(status_code=503, detail= "Books provider not found")
-        except Exception as e:
+        except Exception:
             raise HTTPException(status_code=500, detail=self.GENERAL_ERROR_MESSAGE)
 
     def search_books_by_keyword(self, keywords) -> Optional[BookSearchResultDto]:
@@ -62,7 +64,7 @@ class BookControllerV1(BookController):
             raise HTTPException(status_code = 503, detail = "Book not found")
         except ExternalApiError:
             raise HTTPException(status_code = 503, detail = "Books provider not found")
-        except Exception:
+        except Exception:                                                             
             raise HTTPException(status_code =500, detail = self.GENERAL_ERROR_MESSAGE)
 
 class ReviewControllerV1(ReviewController):

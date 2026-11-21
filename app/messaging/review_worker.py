@@ -1,12 +1,11 @@
-from abc import abstractmethod, ABC
+import json
+from abc import ABC, abstractmethod
+
+from app.config.database_settings import Database
+from app.config.rabbitmq import RabbitMQ
 from app.models.dto import ReviewStatus
 from app.models.models import ReviewCreated
-from app.config.rabbitmq import RabbitMQ
 from app.repository.repository import MariaDbReviewRepository
-from app.config.database_settings import Database
-import pika
-import json
-
 
 ##publisherr
 
@@ -40,7 +39,7 @@ class RabbitMQWorker(ReviewWorker):
         try:
             event = ReviewCreated(**json.loads(body))
             self.process(event)
-        except Exception:
+        except json.JSONDecodeError:
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
             return 
         channel.basic_ack(delivery_tag=method.delivery_tag)

@@ -1,11 +1,12 @@
-from unittest.mock import Mock 
-from app.models.models import Review, ReviewCreated
-from datetime import date 
-from app.messaging.review_queue import ReviewQueue
-from app.models.dto import CreateReviewDto, ReviewDto, ReviewStatus, BookDto
+from unittest.mock import Mock
+
 from app.client.book_client import BookClient
-from app.services.review_service import ReviewServiceV1
+from app.messaging.review_queue import ReviewQueue
+from app.models.dto import CreateReviewDto, ReviewDto, ReviewStatus
+from app.models.models import Review, ReviewCreated
 from app.repository.repository import ReviewRepository
+from app.services.review_service import ReviewServiceV1
+
 
 def test_publish_review_ok():
     client= Mock(spec=BookClient)

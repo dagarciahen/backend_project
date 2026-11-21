@@ -1,6 +1,5 @@
-from abc import ABC, abstractmethod
+from app.models.dto import CreateReviewDto, ReviewDto
 from app.models.models import Review
-from app.models.dto import ReviewDto, CreateReviewDto
 
 
 class ReviewMapper:

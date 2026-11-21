@@ -1,20 +1,22 @@
 
-import hashlib, hmac
+import hashlib
+import hmac
 import os
-from typing import Optional, Annotated
 from abc import ABC, abstractmethod
+
 from app.repository.reviewer_repository import ReviewerRepository
+
 
 class AuthService(ABC):
     @abstractmethod
-    def authenticate(self, username: str, password: str) -> Optional[int]:
+    def authenticate(self, username: str, password: str) -> int | None:
         pass
 
 class AuthServiceV1(AuthService):
     def __init__(self, repository: ReviewerRepository) -> None:
         self.repository = repository
 
-    def authenticate(self, username: str, password: str) -> Optional[int]:
+    def authenticate(self, username: str, password: str) -> int | None:
         reviewer = self.repository.get_by_username(username)
         if reviewer is None or not self._verify(password, reviewer.password_hash):
             return None

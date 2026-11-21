@@ -1,8 +1,11 @@
-from abc import abstractmethod, ABC
-from app.models.models import ReviewCreated
-from app.config.rabbitmq import RabbitMQ
-import pika
 import json
+from abc import ABC, abstractmethod
+
+import pika
+
+from app.config.rabbitmq import RabbitMQ
+from app.exceptions import PublishError
+from app.models.models import ReviewCreated
 
 
 ##publisherr
@@ -31,6 +34,8 @@ class RabbitMQReviewQueue(ReviewQueue):
             channel.queue_declare(queue=self.QUEUE, durable = True)
             channel.queue_bind(queue=self.QUEUE, exchange=self.EXCHANGE, routing_key=self.ROUTING_KEY)
             channel.basic_publish(exchange=self.EXCHANGE, routing_key=self.ROUTING_KEY, body=json.dumps({"review_id": event.review_id}), properties=pika.BasicProperties(delivery_mode=2))
+        except Exception: #noqa: BLE001
+            raise PublishError("Failed to publish review")
         finally:
             connection.close()
 
