@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import Optional 
 
 from app.config.database_settings import Database
 from app.models.dto import *
 from app.models.models import *
+
 
 
 class ReviewRepository(ABC):

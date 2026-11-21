@@ -35,11 +35,11 @@ def get_review_controller() -> ReviewController:
 ##books
 
 #https://fastapi.tiangolo.com/tutorial/query-params-str-validations/#query-parameter-list-multiple-values-with-defaults
-@router.get("/book/search")
+@router.get("/books/search")
 def search_books(q: Annotated[str, Query(min_length=1, max_length=100)], controller: Annotated[BookController, Depends(get_book_controller)]) ->  BookSearchResultDto:
     return controller.search_books_by_keyword(q)
 
-@router.get("/book/{book_id}", status_code = 200)
+@router.get("/books/{book_id}", status_code = 200)
 def get_book(book_id: int, controller: Annotated[BookController, Depends(get_book_controller)]) -> BookDto:
     if book_id <= 0 or book_id > MAX_BOOK_ID:
         raise HTTPException(status_code=422, detail="book_id out of range")

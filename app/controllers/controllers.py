@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-
 from fastapi import HTTPException
+from typing import Optional
 
 from app.exceptions import *
 from app.models.dto import *
@@ -13,10 +13,6 @@ from app.services.review_service import ReviewService
 class BookController(ABC):
     @abstractmethod
     def search_book_by_id(self, book_id: int) -> BookDto:
-        pass
-
-    @abstractmethod
-    def search_books_by_id(self, ids: list[int]) -> BookSearchResultDto:
         pass
 
     @abstractmethod
@@ -62,6 +58,8 @@ class BookControllerV1(BookController):
             return self.service.get_books_by_keywords(keywords)
         except BookNotFoundError:
             raise HTTPException(status_code = 503, detail = "Book not found")
+        except ExternalApiTimeoutError:
+            raise HTTPException(status_code=503, detail="Books provider timeout. Check your query and try again")
         except ExternalApiError:
             raise HTTPException(status_code = 503, detail = "Books provider not found")
         except Exception:                                                             

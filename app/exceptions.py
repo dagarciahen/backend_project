@@ -22,3 +22,6 @@ class ReviewerNotFoundError(Exception):
 
 class PublishError(Exception):
     pass
+
+class ExternalApiTimeoutError(Exception):
+    pass

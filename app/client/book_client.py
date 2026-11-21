@@ -5,7 +5,7 @@ import requests
 from dotenv import load_dotenv
 from pydantic import TypeAdapter, ValidationError
 
-from app.exceptions import *
+from app.exceptions import ExternalApiError, ExternalApiTimeoutError
 from app.models.dto import *
 
 load_dotenv()
@@ -43,8 +43,10 @@ class GutendexClient(BookClient):
             if resp.status_code != 404:
                 resp.raise_for_status()
             return resp
-        except requests.RequestException:
-            raise ExternalApiError()
+        except requests.RequestException as exc:
+            raise ExternalApiTimeoutError() from exc
+        except requests.RequestException as exc:
+            raise ExternalApiError() from exc
 
     def _parse(self, adapter: TypeAdapter, resp: requests.Response):
         try:
