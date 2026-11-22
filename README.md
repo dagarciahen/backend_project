@@ -87,3 +87,31 @@ Delete the given review.
 Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
 Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
 analysis, coding standards automations, etc.
+
+
+## How to run
+
+```bash
+docker compose up --build
+```
+
+- **API**: http://localhost:8000
+- **Interactive docs (Swagger)**: http://localhost:8000/docs
+- **RabbitMQ management**: http://localhost:15672 (user `user`, password `password`)
+- **MariaDB**: `localhost:3306`
+
+## testing
+
+Smoke test with project up
+
+
+```bash
+docker compose run --rm test
+```
+
+```bash
+python smoke_test.py
+```
+
+![alt text](image.png)
+

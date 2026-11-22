@@ -13,7 +13,6 @@ class PersonDto:
 class ReviewStatus(str, Enum):
     PENDING = "pending"
     PROCESSED = "processed"
-    PROCESSING = "processing"
 
 
 @dataclass

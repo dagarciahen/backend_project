@@ -45,6 +45,6 @@ services:
       - db
       - rabbitmq
     command: >
-      sh -c "ruff check . &&
-             python -m pytest -v &&
-             python -m pytest --cov=app --cov-report=term-missing""
+      sh -c "ruff check . && 
+              python -m pytest -v &&
+             python -m pytest --cov=app --cov-report=term-missing"

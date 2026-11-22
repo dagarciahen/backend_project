@@ -83,7 +83,7 @@ def get_review(
     controller: Annotated[ReviewController, Depends(get_review_controller)],
 ) -> ReviewDto:
     review = controller.get_review(review_id)
-    if review.status == "processing":
+    if review.status == "pending":
         response.status_code = 202
     return review
 
