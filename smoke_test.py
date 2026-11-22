@@ -7,7 +7,7 @@ r = requests.get(f"{url}/books/search", params={"q": "frankenstein"})
 assert r.status_code == 200, r.text
 print("search:", r.status_code, r.json()["count"])
 
-## important note I found sometimes the gutendex endpoint fails with id 
+## important note I found sometimes the gutendex endpoint fails with id
 r = requests.get(f"{url}/books/84")
 assert r.status_code == 200, r.text
 print("get book:", r.status_code, r.json()["title"])

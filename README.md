@@ -85,7 +85,6 @@ Delete the given review.
 
 ## Miscellaneous
 Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
-Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
 analysis, coding standards automations, etc.
 
 
@@ -108,6 +107,7 @@ Smoke test with project up
 ```bash
 docker compose run --rm test
 ```
+pytest for unit test and ruff check for code standards and format
 
 ```bash
 python smoke_test.py
