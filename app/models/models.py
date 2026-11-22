@@ -13,21 +13,23 @@ class Book:
     summaries: list[str]
     languages: list[str]
 
+
 @dataclass
 class Person:
-    birth_year : int | None
-    death_year : int | None
-    name : str
+    birth_year: int | None
+    death_year: int | None
+    name: str
 
 
-@dataclass 
+@dataclass
 class Reviewer:
     reviewer_id: int
     username: str
-    email: str 
-    password_hash: str 
+    email: str
+    password_hash: str
     joined_at: date
-    
+
+
 @dataclass
 class Review:
     reviewer_id: int
@@ -35,9 +37,10 @@ class Review:
     comment: str
     rating: int
     status: ReviewStatus = ReviewStatus.PENDING
-    review_id : int | None = None 
-    review_date : date | None = None
+    review_id: int | None = None
+    review_date: date | None = None
+
 
 @dataclass
 class ReviewCreated:
-    review_id : int 
+    review_id: int

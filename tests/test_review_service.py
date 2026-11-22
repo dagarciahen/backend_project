@@ -9,7 +9,7 @@ from app.services.review_service import ReviewServiceV1
 
 
 def test_publish_review_ok():
-    client= Mock(spec=BookClient)
+    client = Mock(spec=BookClient)
     repository = Mock(spec=ReviewRepository)
     queue = Mock(spec=ReviewQueue)
     service = ReviewServiceV1(client, repository, queue)
@@ -31,9 +31,7 @@ def test_publish_review_ok():
     repository.save.assert_called_once_with(review, status=ReviewStatus.PENDING)
     service.mapper.to_dto.assert_called_once_with(saved)
     queue.publish_review_created.assert_called_once_with(ReviewCreated(review_id=2))
-    
-    
-    
+
 
 def test_update_review_ok():
     client = Mock(spec=BookClient)
@@ -60,13 +58,15 @@ def test_update_review_ok():
 
     assert result is expected_dto
     service.validator.validate_update.assert_called_once_with(4, "Excellent")
-    repository.update.assert_called_once_with(5, "Excellent", 4, status=ReviewStatus.PENDING)
+    repository.update.assert_called_once_with(
+        5, "Excellent", 4, status=ReviewStatus.PENDING
+    )
     queue.publish_review_created.assert_called_once_with(ReviewCreated(review_id=5))
     service.mapper.to_dto.assert_called_once_with(updated)
-    
+
 
 def test_get_review_ok():
-    client= Mock(spec=BookClient)
+    client = Mock(spec=BookClient)
     repository = Mock(spec=ReviewRepository)
     queue = Mock(spec=ReviewQueue)
     service = ReviewServiceV1(client, repository, queue)
@@ -79,21 +79,18 @@ def test_get_review_ok():
     assert result is expected_dto
     repository.get_by_id.assert_called_once_with(1)
 
+
 def test_delete_review_ok():
-    client= Mock(spec=BookClient)
+    client = Mock(spec=BookClient)
     repository = Mock(spec=ReviewRepository)
     queue = Mock(spec=ReviewQueue)
     review = Mock(spec=ReviewDto)
     review.review_id = 1
     review.reviewer_id = 2
-    repository.get_by_id.return_value= review
+    repository.get_by_id.return_value = review
 
     service = ReviewServiceV1(client, repository, queue)
 
     repository.delete.return_value = review
-    service.delete_review(1,2)
-    repository.delete.assert_called_once_with(1,2)
-    
-
-
-    
+    service.delete_review(1, 2)
+    repository.delete.assert_called_once_with(1, 2)

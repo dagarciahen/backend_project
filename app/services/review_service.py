@@ -9,7 +9,8 @@ from app.repository.repository import ReviewRepository
 from app.services.review_mapper import ReviewMapper
 from app.services.review_validator import ReviewValidator
 
-#interface
+# interface
+
 
 class ReviewService(ABC):
     @abstractmethod
@@ -18,26 +19,32 @@ class ReviewService(ABC):
 
     @abstractmethod
     def get_review(self, review_id: int) -> ReviewDto:
-        pass 
-
-    @abstractmethod
-    def update_review(self, review_id: int, comment: str, rating: int, reviewer_id: int) -> ReviewDto:
         pass
 
-    @abstractmethod 
+    @abstractmethod
+    def update_review(
+        self, review_id: int, comment: str, rating: int, reviewer_id: int
+    ) -> ReviewDto:
+        pass
+
+    @abstractmethod
     def delete_review(self, review_id: int, reviewer_id: int) -> None:
         pass
 
 
 class ReviewServiceV1(ReviewService):
-    def __init__(self, client: BookClient, repository: ReviewRepository, queue: RabbitMQReviewQueue) -> None:
+    def __init__(
+        self,
+        client: BookClient,
+        repository: ReviewRepository,
+        queue: RabbitMQReviewQueue,
+    ) -> None:
         self.client = client
         self.repository = repository
-        self.queue = queue 
+        self.queue = queue
         self.validator = ReviewValidator(client)
         self.mapper = ReviewMapper()
         self.queue = queue
-
 
     def publish_review(self, dto: CreateReviewDto, reviewer_id: int) -> ReviewDto:
         """
@@ -54,19 +61,22 @@ class ReviewServiceV1(ReviewService):
         if review is None:
             raise ReviewNotFoundError
         return self.mapper.to_dto(review)
-    
-    def update_review(self, review_id: int, comment: str, rating: int, reviewer_id: int) -> ReviewDto:
+
+    def update_review(
+        self, review_id: int, comment: str, rating: int, reviewer_id: int
+    ) -> ReviewDto:
         self.validator.validate_update(rating, comment)
         review = self.repository.get_by_id(review_id)
         if review is None:
             raise ReviewNotFoundError
         if review.reviewer_id != reviewer_id:
             raise ReviewerNotFoundError()
-        
-        updated = self.repository.update(review_id, comment, rating, status=ReviewStatus.PENDING)
+
+        updated = self.repository.update(
+            review_id, comment, rating, status=ReviewStatus.PENDING
+        )
         self.queue.publish_review_created(ReviewCreated(updated.review_id))
         return self.mapper.to_dto(updated)
-
 
     def delete_review(self, review_id: int, reviewer_id: int) -> None:
         review = self.repository.get_by_id(review_id)
@@ -75,6 +85,3 @@ class ReviewServiceV1(ReviewService):
         if review.reviewer_id != reviewer_id:
             raise ReviewerNotFoundError()
         self.repository.delete(review_id, reviewer_id)
-
-
-

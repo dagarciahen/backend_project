@@ -1,22 +1,50 @@
 services:
-
   db:
     image: mariadb:11.3.2
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: BooksReview
+      MYSQL_DATABASE: BooksReviews
     ports:
       - "3306:3306"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   rabbitmq:
-      image: rabbitmq:3.13.0-management
-      environment:
-        RABBITMQ_DEFAULT_USER: user
-        RABBITMQ_DEFAULT_PASS: password
-      ports:
-        - "5672:5672"
-        - "15672:15672"
+    image: rabbitmq:3.13.0-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api:
+    build: .
+    env_file: .env.example
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  worker:
+    build: .
+    env_file: .env.example
+    depends_on:
+      - db
+      - rabbitmq
+    command: python -m app.messaging.review_worker
+
+  test:
+    build: .
+    env_file: .env.example
+    depends_on:
+      - db
+      - rabbitmq
+    command: >
+      sh -c "ruff check . &&
+             python -m pytest -v &&
+             python -m pytest --cov=app --cov-report=term-missing""

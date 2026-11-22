@@ -17,7 +17,7 @@ class BookService(ABC):
 
 class BookServiceV1(BookService):
     def __init__(self, client: BookClient) -> None:
-        self.client = client 
+        self.client = client
 
     def get_book_by_id(self, id: int) -> BookDto:
         book = self.client.get_by_id(id)
@@ -27,9 +27,3 @@ class BookServiceV1(BookService):
 
     def get_books_by_keywords(self, query) -> BookSearchResultDto:
         return self.client.search(query)
-
-
-
-
-    
-    

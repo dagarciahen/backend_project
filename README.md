@@ -84,6 +84,6 @@ DELETE /review/{id}
 Delete the given review.
 
 ## Miscellaneous
-
+Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
 Feel free to add everything that's useful or necessary to write high quality code, such as: automatic tests, static code
 analysis, coding standards automations, etc.

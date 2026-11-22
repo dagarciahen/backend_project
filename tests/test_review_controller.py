@@ -21,8 +21,6 @@ def test_publish_review_ok():
     service.publish_review.assert_called_once_with(create_review_dto, 1)
 
 
-
-
 def test_update_review_ok():
     service = Mock(spec=ReviewService)
     controller = ReviewControllerV1(service)
@@ -31,8 +29,9 @@ def test_update_review_ok():
 
     result = controller.update_review(5, "new", 4, 7)
 
-    assert result is review_dto 
+    assert result is review_dto
     service.update_review.assert_called_once_with(5, "new", 4, 7)
+
 
 def test_publish_review_invalid_rating():
     service = Mock(spec=ReviewService)
@@ -43,6 +42,7 @@ def test_publish_review_invalid_rating():
     with pytest.raises(HTTPException) as exc:
         controller.publish_review(create_review_dto, reviewer_id=7)
     assert exc.value.status_code == 422
+
 
 def test_publish_review_invalid_comment():
     service = Mock(spec=ReviewService)
@@ -101,7 +101,6 @@ def test_get_review_not_found():
         controller.get_review(5)
 
     assert exc.value.status_code == 404
-
 
 
 def test_update_review_not_found():

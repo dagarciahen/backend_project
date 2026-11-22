@@ -29,7 +29,13 @@ def test_get_by_id_returns_review():
     conn = database.get_connection.return_value
     cursor = conn.cursor.return_value
     cursor.fetchone.return_value = (
-        3, 1, 10, "good book", 5, ReviewStatus.PENDING.value, date(2026, 11, 19)
+        3,
+        1,
+        10,
+        "good book",
+        5,
+        ReviewStatus.PENDING.value,
+        date(2026, 11, 19),
     )
     repository = MariaDbReviewRepository(database)
 

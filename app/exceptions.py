@@ -1,8 +1,10 @@
 class BookNotFoundError(Exception):
     pass
 
+
 class InvalidQueryError(Exception):
     pass
+
 
 class ExternalApiError(Exception):
     pass
@@ -11,17 +13,22 @@ class ExternalApiError(Exception):
 class InvalidRatingError(Exception):
     pass
 
+
 class InvalidCommentError(Exception):
     pass
+
 
 class ReviewNotFoundError(Exception):
     pass
 
+
 class ReviewerNotFoundError(Exception):
     pass
+
 
 class PublishError(Exception):
     pass
 
-class ExternalApiTimeoutError(Exception):
+
+class ExternalApiTimeoutError(ExternalApiError):
     pass

@@ -7,7 +7,8 @@ from enum import Enum
 class PersonDto:
     birth_year: int | None
     death_year: int | None
-    name : str
+    name: str
+
 
 class ReviewStatus(str, Enum):
     PENDING = "pending"
@@ -23,13 +24,14 @@ class ReviewDto:
     rating: int
     comment: str
     review_date: datetime
-    status : ReviewStatus
+    status: ReviewStatus
+
 
 @dataclass
 class BookDto:
     id: int
     title: str
-    subjects : list[str]
+    subjects: list[str]
     authors: list[PersonDto]
     summaries: list[str]
     translators: list[PersonDto]
@@ -40,6 +42,7 @@ class BookDto:
     formats: dict[str, str]
     download_count: int
 
+
 @dataclass
 class BookSearchResultDto:
     count: int | None
@@ -47,12 +50,13 @@ class BookSearchResultDto:
     previous: str | None
     results: list[BookDto]
 
+
 @dataclass
 class BookItemResultDto:
     id: int
     status: int
     book: BookDto | None = None
-    error : str | None = None
+    error: str | None = None
 
 
 @dataclass
@@ -61,10 +65,11 @@ class ReviewerDto:
     username: str
     joined_at: datetime
     review_count: int
+
+
 @dataclass
 class ReviewsSearchsDto:
     results: list[ReviewDto]
-
 
 
 @dataclass
@@ -74,12 +79,7 @@ class CreateReviewDto:
     comment: str
 
 
-
 @dataclass
 class UpdateReviewDto:
     comment: str
     rating: int
-
-
-
-    
