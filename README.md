@@ -115,3 +115,11 @@ python smoke_test.py
 
 ![alt text](image.png)
 
+## Comments
+
+To develop this project a layered design was implemented with each layer behind an abstract interface. Fast Api routes to handle the incoming requests the validtation logic and the error handling are abstracted away in the controllers module and the logic for search books by id and publish or modified a review lives on service module, as does as the messagin exchange. 
+Once the user publishes a review, a ReviewCreated event is creatied with a review id associated to a Review Object with status pending. The user receives a 202 indicating that the review was accepted and is being processed, and when the user later requests the review, the API keeps answering 202 while it is still pending and returns 200 with the review data once processed.
+A simple authentication logic using HTTP Basic, where the password is stored as a SHA-256 hash with a random salt and verified with constant time comparision. The reviewer is taken from the credentials instead of the request body, which prevents a user from modifying a review that belongs to a different user.
+For messaging, RabbitMQ was implemented using a durable direct exchange that routes the review.created events to a single durable queue with one consumer, the reviewer worker, which runs as a separate process, takes one message at a time and marks the review as processed. Messages are published as persistent and the worker acknowledges them manually, so a message is only removed from the queue once it has been handled. Separating the API from the worker keeps the request fast and allows the processing to be scaled or replaced independently.
+A clear interface was defined for every module in order to present a clean architecture and to be able to extend or remove functionalities without affecting the core functionality, for example extending the service to a different book API, another message broker or another database.
+Ruff was used to enforce code style and formatting standards, and pytest with pytest-cov was used for unit testing and code coverage. A GitHub Actions CI workflow runs these checks automatically on every push and pull request.
