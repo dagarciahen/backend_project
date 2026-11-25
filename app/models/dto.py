@@ -24,6 +24,9 @@ class ReviewDto:
     comment: str
     review_date: datetime
     status: ReviewStatus
+    book_title: str | None = None
+    book_authors: str | None = None
+    cover_url: str | None = None
 
 
 @dataclass

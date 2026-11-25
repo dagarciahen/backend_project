@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS reviews (
     rating TINYINT NOT NULL CHECK(rating BETWEEN 1 AND 5),
     status ENUM('pending', 'processing', 'processed') NOT NULL DEFAULT 'pending',
     review_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    book_title VARCHAR(500) NULL,
+    book_authors VARCHAR(500) NULL,
+    cover_url VARCHAR(500) NULL,
     FOREIGN KEY (reviewer_id) REFERENCES reviewers(reviewer_id)
 
 );

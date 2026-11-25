@@ -20,4 +20,7 @@ class ReviewMapper:
             comment=review.comment,
             review_date=review.review_date,
             status=review.status,
+            book_title=review.book_title,
+            book_authors=review.book_authors,
+            cover_url=review.cover_url,
         )

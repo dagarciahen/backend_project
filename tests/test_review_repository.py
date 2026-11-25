@@ -36,6 +36,9 @@ def test_get_by_id_returns_review():
         5,
         ReviewStatus.PENDING.value,
         date(2026, 11, 19),
+        "Frankenstein",
+        "Shelley, Mary",
+        "https://cover.jpg",
     )
     repository = MariaDbReviewRepository(database)
 
@@ -45,4 +48,28 @@ def test_get_by_id_returns_review():
     assert review.reviewer_id == 1
     assert review.book_id == 10
     assert review.status == ReviewStatus.PENDING
+    assert review.book_title == "Frankenstein"
+    assert review.book_authors == "Shelley, Mary"
+    assert review.cover_url == "https://cover.jpg"
+    conn.close.assert_called_once()
+
+
+def test_save_enrichment_updates_data_and_status():
+    database = Mock()
+    conn = database.get_connection.return_value
+    cursor = conn.cursor.return_value
+    repository = MariaDbReviewRepository(database)
+
+    repository.save_enrichment(3, "Frankenstein", "Shelley, Mary", "https://cover.jpg")
+
+    sql, params = cursor.execute.call_args[0]
+    assert "UPDATE reviews SET book_title" in sql
+    assert params == (
+        "Frankenstein",
+        "Shelley, Mary",
+        "https://cover.jpg",
+        ReviewStatus.PROCESSED.value,
+        3,
+    )
+    conn.commit.assert_called_once()
     conn.close.assert_called_once()

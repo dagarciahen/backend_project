@@ -21,11 +21,21 @@ class ReviewRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, review_id: int, reviewer_id: int) -> Review | None:
+    def get_by_id(self, review_id: int) -> Review | None:
         pass
 
     @abstractmethod
     def update_status(self, review_id: int, status: ReviewStatus) -> None:
+        pass
+
+    @abstractmethod
+    def save_enrichment(
+        self,
+        review_id: int,
+        title: str | None,
+        authors: str | None,
+        cover_url: str | None,
+    ) -> None:
         pass
 
 
@@ -38,7 +48,8 @@ class MariaDbReviewRepository(ReviewRepository):
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "SElect review_id, reviewer_id, book_id, comment, rating, status, review_date "
+                "SELECT review_id, reviewer_id, book_id, comment, rating, status, "
+                "review_date, book_title, book_authors, cover_url "
                 "FROM reviews WHERE review_id = ?",
                 (review_id,),
             )
@@ -53,6 +64,9 @@ class MariaDbReviewRepository(ReviewRepository):
                 rating=row[4],
                 status=ReviewStatus(row[5]),
                 review_date=row[6],
+                book_title=row[7],
+                book_authors=row[8],
+                cover_url=row[9],
             )
         finally:
             conn.close()
@@ -112,6 +126,25 @@ class MariaDbReviewRepository(ReviewRepository):
             cursor.execute(
                 "UPDATE reviews SET status = ? WHERE review_id = ?",
                 (status.value, review_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    def save_enrichment(
+        self,
+        review_id: int,
+        title: str | None,
+        authors: str | None,
+        cover_url: str | None,
+    ) -> None:
+        conn = self.database.get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE reviews SET book_title = ?, book_authors = ?, cover_url = ?, "
+                "status = ? WHERE review_id = ?",
+                (title, authors, cover_url, ReviewStatus.PROCESSED.value, review_id),
             )
             conn.commit()
         finally:

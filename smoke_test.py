@@ -1,3 +1,5 @@
+import time
+
 import requests
 
 url = "http://localhost:8000"
@@ -35,9 +37,17 @@ r = requests.put(
 assert r.status_code == 202, r.text
 print("update:", r.status_code)
 
-r = requests.get(f"{url}/review/{review_id}")
+for _ in range(20):
+    r = requests.get(f"{url}/review/{review_id}")
+    if r.status_code == 200:
+        break
+    assert r.status_code == 202, r.text
+    time.sleep(1)
+
 assert r.status_code == 200, r.text
-print("get review ok", r.status_code)
+assert r.json()["status"] == "processed"
+assert r.json()["book_title"]
+print("get review ok", r.status_code, r.json()["book_title"])
 
 r = requests.delete(f"{url}/review/{review_id}", auth=auth)
 assert r.status_code == 200, r.text

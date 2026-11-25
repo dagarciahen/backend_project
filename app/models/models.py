@@ -39,6 +39,9 @@ class Review:
     status: ReviewStatus = ReviewStatus.PENDING
     review_id: int | None = None
     review_date: date | None = None
+    book_title: str | None = None
+    book_authors: str | None = None
+    cover_url: str | None = None
 
 
 @dataclass
